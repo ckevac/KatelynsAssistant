@@ -1,0 +1,416 @@
+/* Katelyn's School Assistant — design system
+   Planner/binder concept: each cycle day (Day 1–5) reads like a colored
+   tab divider; subjects get consistent color tags throughout the app. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --paper: #F0F3EE;
+  --paper-raised: #FFFFFF;
+  --ink: #16231D;
+  --ink-soft: #4B564F;
+  --line: #D8DED6;
+  --pine: #1F5C4C;
+  --pine-dark: #163F35;
+  --marigold: #F2A63D;
+  --coral: #E4572E;
+  --ok: #2E7D4F;
+
+  --day-1: #1F5C4C;
+  --day-2: #2F6690;
+  --day-3: #8A5A44;
+  --day-4: #6B4E8E;
+  --day-5: #B08628;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(22, 35, 29, 0.06), 0 4px 14px rgba(22, 35, 29, 0.07);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  padding-bottom: calc(72px + var(--safe-bottom));
+}
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.15; }
+p { margin: 0; }
+button { font-family: inherit; }
+
+a { color: var(--pine); }
+
+/* ---------- App shell ---------- */
+#app { max-width: 560px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+.screen { display: none; padding: calc(20px + var(--safe-top)) 18px 24px; animation: fade-in .18s ease; }
+.screen.active { display: block; }
+
+@keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .screen { animation: none; }
+}
+
+/* ---------- Bottom nav ---------- */
+.tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  background: var(--paper-raised);
+  border-top: 1px solid var(--line);
+  padding: 8px 6px calc(8px + var(--safe-bottom));
+  z-index: 20;
+}
+
+.tabbar button {
+  flex: 1;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 2px;
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tabbar button.active { color: var(--pine); }
+.tabbar button svg { width: 22px; height: 22px; }
+.tabbar button span { font-size: 11px; font-weight: 600; }
+
+/* ---------- Day tab badge ---------- */
+.day-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+}
+.day-badge.day-1 { background: var(--day-1); }
+.day-badge.day-2 { background: var(--day-2); }
+.day-badge.day-3 { background: var(--day-3); }
+.day-badge.day-4 { background: var(--day-4); }
+.day-badge.day-5 { background: var(--day-5); }
+.day-badge.no-school { background: var(--ink-soft); }
+
+/* ---------- Today screen ---------- */
+.today-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.today-header .date {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+}
+.today-header .subdate { color: var(--ink-soft); font-size: 14px; margin-top: 2px; }
+.icon-btn {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--ink);
+}
+.icon-btn svg { width: 18px; height: 18px; }
+
+.no-school-card {
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  padding: 22px 18px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.no-school-card .big { font-family: var(--font-display); font-size: 20px; margin-bottom: 4px; }
+.no-school-card .small { color: var(--ink-soft); font-size: 14px; }
+
+/* ---------- Period list (timeline) ---------- */
+.period-list { list-style: none; margin: 18px 0; padding: 0; position: relative; }
+.period-list::before {
+  content: '';
+  position: absolute;
+  left: 54px;
+  top: 6px; bottom: 6px;
+  width: 1px;
+  background: var(--line);
+}
+.period-row {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 14px;
+  padding: 9px 0;
+  align-items: flex-start;
+}
+.period-time { font-size: 12px; color: var(--ink-soft); text-align: right; padding-top: 3px; line-height: 1.3; }
+.period-card {
+  background: var(--paper-raised);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.period-row.is-break .period-card {
+  background: transparent;
+  box-shadow: none;
+  padding: 4px 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-style: italic;
+}
+.subject-tag {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 14.5px;
+  margin-bottom: 2px;
+}
+.period-meta { font-size: 12.5px; color: var(--ink-soft); }
+
+/* ---------- Due-today / assignment cards ---------- */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  margin: 22px 0 10px;
+}
+.assignment-card {
+  background: var(--paper-raised);
+  border-radius: var(--radius-sm);
+  padding: 12px 13px;
+  box-shadow: var(--shadow);
+  margin-bottom: 9px;
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+}
+.assignment-card.completed { opacity: 0.5; }
+.assignment-check {
+  width: 22px; height: 22px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--paper-raised);
+}
+.assignment-check.checked { background: var(--ok); border-color: var(--ok); }
+.assignment-check svg { width: 13px; height: 13px; color: white; display: none; }
+.assignment-check.checked svg { display: block; }
+.assignment-body { flex: 1; min-width: 0; }
+.assignment-title { font-weight: 600; font-size: 14.5px; }
+.assignment-title.completed { text-decoration: line-through; }
+.assignment-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+.assignment-details { font-size: 13.5px; margin-top: 4px; color: var(--ink); }
+.assignment-due {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.assignment-due.overdue { background: rgba(228,87,46,0.13); color: var(--coral); }
+.assignment-due.today { background: rgba(242,166,61,0.2); color: #8a5a12; }
+.assignment-due.upcoming { background: rgba(31,92,76,0.1); color: var(--pine-dark); }
+.delete-btn {
+  background: none; border: none; color: var(--ink-soft);
+  cursor: pointer; padding: 4px; flex-shrink: 0;
+}
+.delete-btn svg { width: 16px; height: 16px; }
+
+.empty-note {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  padding: 14px 2px;
+}
+
+/* ---------- Week screen ---------- */
+.day-tabs { display: flex; gap: 7px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+.day-tabs button {
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+.day-tabs button.active { color: white; border-color: transparent; }
+.day-tabs button.active.day-1 { background: var(--day-1); }
+.day-tabs button.active.day-2 { background: var(--day-2); }
+.day-tabs button.active.day-3 { background: var(--day-3); }
+.day-tabs button.active.day-4 { background: var(--day-4); }
+.day-tabs button.active.day-5 { background: var(--day-5); }
+
+/* ---------- Add screen (form) ---------- */
+.type-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+.type-toggle button {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line);
+  background: var(--paper-raised);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.type-toggle button.active { border-color: var(--pine); color: var(--pine); background: rgba(31,92,76,0.07); }
+
+.field-label { font-size: 13px; font-weight: 600; margin: 16px 0 7px; display: block; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--paper-raised);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink);
+}
+.chip.selected { color: white; border-color: transparent; }
+
+textarea, input[type="date"], input[type="text"], input[type="password"], input[type="tel"] {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line);
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--paper-raised);
+  color: var(--ink);
+}
+textarea { min-height: 84px; resize: vertical; }
+input:focus, textarea:focus, button:focus-visible, .chip:focus-visible, .assignment-check:focus-visible {
+  outline: 2px solid var(--pine);
+  outline-offset: 1px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--pine);
+  color: white;
+  font-weight: 600;
+  font-size: 15.5px;
+  margin-top: 22px;
+  cursor: pointer;
+}
+.primary-btn:disabled { background: var(--ink-soft); opacity: 0.6; }
+.primary-btn.saved { background: var(--ok); }
+
+.toast {
+  position: fixed;
+  bottom: calc(84px + var(--safe-bottom));
+  left: 50%; transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+.toast.show { opacity: 1; }
+
+/* ---------- Calendar screen ---------- */
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-header .month-label { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.cal-dow { text-align: center; font-size: 11px; color: var(--ink-soft); font-weight: 600; padding-bottom: 4px; }
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 9px;
+  background: var(--paper-raised);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  position: relative;
+  gap: 2px;
+}
+.cal-cell.empty { background: transparent; cursor: default; }
+.cal-cell.weekend { background: transparent; color: var(--ink-soft); cursor: default; }
+.cal-cell.no-school { background: rgba(75,86,79,0.08); color: var(--ink-soft); }
+.cal-cell.selected { border-color: var(--pine); }
+.cal-cell.today-cell { font-weight: 700; }
+.cal-daynum { line-height: 1; }
+.cal-dot { width: 5px; height: 5px; border-radius: 999px; background: var(--coral); position: absolute; bottom: 5px; }
+.cal-tag {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: white;
+  border-radius: 5px;
+  padding: 1px 4px;
+  line-height: 1.3;
+}
+.cal-tag.day-1 { background: var(--day-1); }
+.cal-tag.day-2 { background: var(--day-2); }
+.cal-tag.day-3 { background: var(--day-3); }
+.cal-tag.day-4 { background: var(--day-4); }
+.cal-tag.day-5 { background: var(--day-5); }
+
+.cal-detail {
+  margin-top: 18px;
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.cal-detail .heading { font-family: var(--font-display); font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+
+/* ---------- Login screen ---------- */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.login-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.login-sub { color: var(--ink-soft); font-size: 14.5px; margin-bottom: 26px; }
+.login-wrap input { text-align: center; letter-spacing: 4px; font-size: 20px; }
+.login-error { color: var(--coral); font-size: 13.5px; margin-top: 10px; min-height: 18px; }
+
+/* ---------- Loading ---------- */
+.spinner {
+  width: 26px; height: 26px;
+  border: 3px solid var(--line);
+  border-top-color: var(--pine);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 30px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}
