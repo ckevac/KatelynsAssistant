@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Google Sign-In Test — Katelyn's School App</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 560px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+  h1 { font-size: 20px; }
+  .box { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-top: 16px; }
+  .ok { color: #0a7a2f; }
+  .err { color: #b3261e; white-space: pre-wrap; word-break: break-word; }
+  .warn { color: #a15c00; }
+  button { padding: 10px 16px; font-size: 15px; border-radius: 8px; border: none; background: #1a73e8; color: white; cursor: pointer; }
+  button:disabled { background: #999; cursor: not-allowed; }
+  input { width: 100%; padding: 8px; margin: 6px 0 14px; box-sizing: border-box; }
+  label { font-size: 13px; font-weight: 600; }
+  #log { font-family: ui-monospace, monospace; font-size: 13px; }
+  #status { font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+  <h1>Sign-in / Sheets access test</h1>
+  <p>This page tests whether Katelyn's school Google account can sign in and read the schedule spreadsheet. It doesn't save anything and isn't the real app.</p>
+
+  <div class="box">
+    <label>Google OAuth Client ID (from Google Cloud Console)</label>
+    <input id="clientId" placeholder="xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com">
+    <label>Spreadsheet ID</label>
+    <input id="sheetId" value="1IpaBsb3He2NvqCTp-3jxgxD5B0ki_5VXiKRSLxZE0cg">
+    <button id="go" disabled>Loading Google library…</button>
+    <div id="status">Waiting for accounts.google.com/gsi/client to load…</div>
+  </div>
+
+  <div class="box">
+    <b>Test 2 — identity only, no file access requested at all</b>
+    <p style="font-size:13px;color:#555;margin:6px 0 12px;">This checks whether basic "Sign in with Google" (just confirming who she is) is allowed even if Sheets access isn't.</p>
+    <button id="go2" disabled>Loading Google library…</button>
+  </div>
+
+  <div class="box">
+    <div id="log">(results will appear here)</div>
+  </div>
+
+<script>
+  const statusEl = document.getElementById('status');
+  const btn = document.getElementById('go');
+  const btn2 = document.getElementById('go2');
+  let gsiLoaded = false;
+
+  function markReady() {
+    gsiLoaded = true;
+    btn.disabled = false;
+    btn.textContent = 'Sign in with Google & test';
+    btn2.disabled = false;
+    btn2.textContent = 'Sign in (identity only)';
+    statusEl.innerHTML = '<span class="ok">Google sign-in library loaded OK.</span>';
+  }
+  function markFailed() {
+    statusEl.innerHTML = '<span class="err">Google\'s sign-in library never loaded (accounts.google.com/gsi/client). ' +
+      'This usually means the network or device is blocking that domain — try a different network, ' +
+      'a different device, or check for content-filtering/parental-control software.</span>';
+  }
+  // Poll for readiness instead of relying on async/defer ordering
+  let attempts = 0;
+  const poll = setInterval(() => {
+    attempts++;
+    if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+      clearInterval(poll);
+      markReady();
+    } else if (attempts > 25) { // ~10 seconds
+      clearInterval(poll);
+      markFailed();
+    }
+  }, 400);
+</script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+  const logEl = document.getElementById('log');
+  function log(msg, cls) {
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = msg;
+    logEl.appendChild(line);
+  }
+
+  btn.addEventListener('click', () => {
+    logEl.innerHTML = '';
+    if (!gsiLoaded) {
+      log('Google library is not loaded yet — see the status message above.', 'err');
+      return;
+    }
+    const clientId = document.getElementById('clientId').value.trim();
+    const sheetId = document.getElementById('sheetId').value.trim();
+    if (!clientId) { log('Enter a Client ID first.', 'err'); return; }
+
+    log('Requesting sign-in popup…');
+    try {
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
+        callback: async (resp) => {
+          if (resp.error) {
+            log('Sign-in / consent error: ' + resp.error, 'err');
+            return;
+          }
+          log('Sign-in succeeded, got an access token.', 'ok');
+          log('Now trying to read the spreadsheet…');
+          try {
+            const r = await fetch(
+              `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=properties.title,sheets.properties.title`,
+              { headers: { Authorization: 'Bearer ' + resp.access_token } }
+            );
+            const data = await r.json();
+            if (!r.ok) {
+              log('Sheets API error (' + r.status + '):\n' + JSON.stringify(data, null, 2), 'err');
+              return;
+            }
+            log('SUCCESS — spreadsheet title: "' + data.properties.title + '"', 'ok');
+            log('Tabs found: ' + data.sheets.map(s => s.properties.title).join(', '), 'ok');
+          } catch (e) {
+            log('Network/fetch error: ' + e.message, 'err');
+          }
+        },
+      });
+      client.requestAccessToken();
+    } catch (e) {
+      log('Could not start sign-in: ' + e.message, 'err');
+    }
+  });
+
+  function decodeJwt(token) {
+    const payload = token.split('.')[1];
+    const json = decodeURIComponent(atob(payload.replace(/-/g,'+').replace(/_/g,'/'))
+      .split('').map(c => '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  }
+
+  btn2.addEventListener('click', () => {
+    logEl.innerHTML = '';
+    const clientId = document.getElementById('clientId').value.trim();
+    if (!clientId) { log('Enter a Client ID first.', 'err'); return; }
+    log('Requesting identity-only sign-in (no scopes)…');
+    try {
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (resp) => {
+          try {
+            const claims = decodeJwt(resp.credential);
+            log('SUCCESS — signed in as: ' + claims.email, 'ok');
+            log('(name: ' + claims.name + ')', 'ok');
+          } catch (e) {
+            log('Got a credential back but could not decode it: ' + e.message, 'err');
+          }
+        },
+      });
+      google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed && notification.isNotDisplayed()) {
+          log('Prompt not displayed: ' + notification.getNotDisplayedReason(), 'warn');
+          log('Trying the popup button flow instead…');
+          google.accounts.id.renderButton(logEl, { theme: 'outline', size: 'large' });
+        }
+        if (notification.isSkippedMoment && notification.isSkippedMoment()) {
+          log('Prompt skipped: ' + notification.getSkippedReason(), 'warn');
+        }
+      });
+    } catch (e) {
+      log('Could not start identity sign-in: ' + e.message, 'err');
+    }
+  });
+</script>
+</body>
+</html>
