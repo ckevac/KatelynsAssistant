@@ -2,27 +2,27 @@
    Planner/binder concept: each cycle day (Day 1–5) reads like a colored
    tab divider; subjects get consistent color tags throughout the app. */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --paper: #F0F3EE;
+  --paper: #F7F6F4;
   --paper-raised: #FFFFFF;
-  --ink: #16231D;
-  --ink-soft: #4B564F;
-  --line: #D8DED6;
-  --pine: #1F5C4C;
-  --pine-dark: #163F35;
-  --marigold: #F2A63D;
-  --coral: #E4572E;
-  --ok: #2E7D4F;
+  --ink: #1A1A1A;
+  --ink-soft: #6E6E6E;
+  --line: #DEDCD9;
+  --pine: #C81E2B;       /* brand red — kept the variable name so the rest of the file didn't need renaming */
+  --pine-dark: #8C1220;  /* deep maroon */
+  --marigold: #C9932E;   /* gold, from the pencil in the logo */
+  --coral: #C81E2B;
+  --ok: #3A3A3A;
 
-  --day-1: #1F5C4C;
-  --day-2: #2F6690;
-  --day-3: #8A5A44;
-  --day-4: #6B4E8E;
-  --day-5: #B08628;
+  --day-1: #8C1220;
+  --day-2: #C81E2B;
+  --day-3: #6E6E6E;
+  --day-4: #C9932E;
+  --day-5: #3A3A3A;
 
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: 'Fredoka', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --radius: 14px;
@@ -229,9 +229,9 @@ a { color: var(--pine); }
   border-radius: 999px;
   white-space: nowrap;
 }
-.assignment-due.overdue { background: rgba(228,87,46,0.13); color: var(--coral); }
-.assignment-due.today { background: rgba(242,166,61,0.2); color: #8a5a12; }
-.assignment-due.upcoming { background: rgba(31,92,76,0.1); color: var(--pine-dark); }
+.assignment-due.overdue { background: rgba(200,30,43,0.12); color: var(--coral); }
+.assignment-due.today { background: rgba(201,147,46,0.22); color: #7A5A1C; }
+.assignment-due.upcoming { background: rgba(26,26,26,0.08); color: var(--ink-soft); }
 .delete-btn {
   background: none; border: none; color: var(--ink-soft);
   cursor: pointer; padding: 4px; flex-shrink: 0;
@@ -277,7 +277,7 @@ a { color: var(--pine); }
   color: var(--ink-soft);
   cursor: pointer;
 }
-.type-toggle button.active { border-color: var(--pine); color: var(--pine); background: rgba(31,92,76,0.07); }
+.type-toggle button.active { border-color: var(--pine); color: var(--pine); background: rgba(200,30,43,0.07); }
 
 .field-label { font-size: 13px; font-weight: 600; margin: 16px 0 7px; display: block; }
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -397,6 +397,7 @@ input:focus, textarea:focus, button:focus-visible, .chip:focus-visible, .assignm
   text-align: center;
 }
 .login-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.login-logo { width: 132px; height: 132px; object-fit: contain; margin: 0 auto 14px; display: block; }
 .login-sub { color: var(--ink-soft); font-size: 14.5px; margin-bottom: 26px; }
 .login-wrap input { text-align: center; letter-spacing: 4px; font-size: 20px; }
 .login-error { color: var(--coral); font-size: 13.5px; margin-top: 10px; min-height: 18px; }

@@ -12,9 +12,14 @@
   let calYear, calMonth;    // 0-indexed month, currently displayed
   let calSelectedDate = null;
 
+  // Mostly drawn from the logo's red/black/gold/grey family; three muted
+  // outliers (navy-grey, plum, teal) are mixed in deliberately — with 10
+  // subjects, an all-red-and-grey set becomes hard to tell apart at a
+  // glance on a busy schedule. Easy to tighten to strictly on-brand if
+  // that's preferred instead.
   const SUBJECT_PALETTE = [
-    '#2F6690', '#8A5A44', '#6B4E8E', '#B08628', '#1F5C4C',
-    '#A44B6F', '#3D7A5C', '#7A5230', '#4A6FA5', '#9C5B3C'
+    '#8C1220', '#C81E2B', '#C9932E', '#3A3A3A', '#6E6E6E',
+    '#7A3B12', '#A85C2E', '#4A4A6A', '#5C3D5C', '#2E6B5C'
   ];
 
   // ---------- date helpers ----------

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksa-shell-v2';
+const CACHE_NAME = 'ksa-shell-v3';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -6,8 +6,13 @@ const SHELL_FILES = [
   './js/api.js',
   './js/app.js',
   './manifest.json',
+  './favicon.ico',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/favicon-32.png',
+  './icons/favicon-48.png',
+  './icons/logo-full.png'
 ];
 // Deliberately NOT precached: js/config.js and data/day-cycle-*.json.
 // Both are things you'll edit after first load (the API URL, or next
